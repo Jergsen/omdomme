@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL", "file:./dev.db")
+}
+
+model Article {
+  id          String    @id @default(cuid())
+  title       String
+  url         String
+  source      String
+  publishedAt DateTime
+  summary     String?
+  content     String?
+  sentiment   Float?
+  focus       String?
+  prScore     Float?
+  reach       Float?
+  createdAt   DateTime  @default(now())
+  profiles    ArticleProfile[]
+  drivers     ArticleDriver[]
+  spokespeople ArticleSpokesperson[]
+
+  @@index([publishedAt])
+  @@index([source])
+}
+
+model Profile {
+  id        String            @id @default(cuid())
+  name      String            @unique
+  keywords  ProfileKeyword[]
+  articles  ArticleProfile[]
+}
+
+model ProfileKeyword {
+  id        String   @id @default(cuid())
+  pattern   String
+  type      KeywordType
+  profile   Profile  @relation(fields: [profileId], references: [id])
+  profileId String
+}
+
+enum KeywordType {
+  include
+  exclude
+  regex
+}
+
+model Spokesperson {
+  id      String   @id @default(cuid())
+  name    String   @unique
+  aliases Alias[]
+  articles ArticleSpokesperson[]
+}
+
+model Alias {
+  id              String        @id @default(cuid())
+  value           String
+  spokesperson    Spokesperson  @relation(fields: [spokespersonId], references: [id])
+  spokespersonId  String
+}
+
+model Driver {
+  id       String          @id @default(cuid())
+  name     String          @unique
+  keywords DriverKeyword[]
+  articles ArticleDriver[]
+}
+
+model DriverKeyword {
+  id        String  @id @default(cuid())
+  value     String
+  driver    Driver  @relation(fields: [driverId], references: [id])
+  driverId  String
+}
+
+model ArticleProfile {
+  id         String   @id @default(cuid())
+  article    Article  @relation(fields: [articleId], references: [id])
+  articleId  String
+  profile    Profile  @relation(fields: [profileId], references: [id])
+  profileId  String
+
+  @@unique([articleId, profileId])
+}
+
+model ArticleDriver {
+  id         String   @id @default(cuid())
+  article    Article  @relation(fields: [articleId], references: [id])
+  articleId  String
+  driver     Driver   @relation(fields: [driverId], references: [id])
+  driverId   String
+
+  @@unique([articleId, driverId])
+}
+
+model ArticleSpokesperson {
+  id              String        @id @default(cuid())
+  article         Article       @relation(fields: [articleId], references: [id])
+  articleId       String
+  spokesperson    Spokesperson  @relation(fields: [spokespersonId], references: [id])
+  spokespersonId  String
+
+  @@unique([articleId, spokespersonId])
+}
