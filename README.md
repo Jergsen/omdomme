@@ -13,10 +13,6 @@ npm run dev
 
 Applikasjonen forventer en `.env` basert på `.env.example`. I utvikling benyttes SQLite (`file:./prisma/dev.db`).
 
-> **Postgres i produksjon**
->
-> Prisma-skjemaet er konfigurert med SQLite som standard for enkel lokal testing. For distribusjon mot Postgres kan du endre `provider`-feltet i `prisma/schema.prisma` til `"postgresql"` og peke `DATABASE_URL` mot din Postgres-instans før du kjører migreringer.
-
 ### Viktige mapper
 
 - `app/` – Next.js App Router med API-endepunkter og UI-komponenter.
